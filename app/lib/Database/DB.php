@@ -45,22 +45,12 @@
 
 		public function update(array $updateColumns) {
 			$query = 'UPDATE ' . $this->table . ' SET ';
-			$loopIndex = 0;
-			foreach ($updateColumns as $key => $value) {
-					$loopIndex++;
-					$columnName = $key;
-					$bindValue = ':' . $columnName;
-					$this->bindedValues[$bindValue] = $value;
-					// If the numbers of elements inside the $updateColumns array is still greater than $loopIndex, a comma will separate the columns. Otherwise it will be set as empty. (title=:title,name=:name,etc.)
-					$separator = count($updateColumns) > $loopIndex ? ',' : '';
-					$query .= $columnName . '=' . $bindValue . $separator;
-			}
-
+			$query = $this->extractBindedValue($updateColumns, $query);
 			$this->query = $query . $this->query;
 			return $this;
 		}
 
-		private function extractBindedValue($columns, $query) {
+		private function extractBindedValue(array $columns, string $query) {
 			$loopIndex = 0;
 			foreach ($columns as $key => $value) {
 					$loopIndex++;
