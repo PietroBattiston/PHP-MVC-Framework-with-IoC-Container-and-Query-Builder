@@ -1,0 +1,9 @@
+QUERYBUILDER
+group by
+
+
+Select Exist
+SELECT EXISTS(SELECT * FROM mvc.posts WHERE id=99);
+it returns 1 if the record exists
+it returns 0 if the record does not exist
+

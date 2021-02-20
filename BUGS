@@ -16,3 +16,9 @@ TypeError: Return value of App\lib\Router::getUrl() must be of the type array, n
 
 D.I.
 https://stackoverflow.com/questions/39246777/how-to-avoid-manually-passing-my-registry-container-into-constructor-of-every-n
+
+
+
+
+PATCH PROBLEM
+https://laraveldaily.com/theres-no-putpatchdelete-method-or-how-to-build-a-laravel-form-manually/

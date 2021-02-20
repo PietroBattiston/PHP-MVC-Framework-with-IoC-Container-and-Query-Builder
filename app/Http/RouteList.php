@@ -11,13 +11,15 @@ namespace App\Http;
             'GET' => [
                 'url' => 'ExampleController@index',
                 'show/{$param}' => 'ExampleController@show',
-                'create/{$param}' => 'ExampleController@create',
-                'update/{$id}' => 'ExampleController@update',
                 'delete/{$id}' => 'ExampleController@delete',
             ],
-            'PATCH' => [
-                'update/{$id}' => 'ExampleController@update'
+            'POST' => [
+                'create' => 'ExampleController@create',
+                'update/{$id}' => 'ExampleController@update'  
                 
+            ],
+            'PATCH' => [
+                'update/{$id}' => 'ExampleController@update'  
             ]
         ];
 

@@ -10,13 +10,21 @@
 		public $query = '';
 		public $statement = '';
 		public $bindedValues = [];
+		public $dbMethod = '';
+		public $affectedRows;
 
-		public function __construct(Database $db) {
+		public function __construct(Database $db) 
+		{
 			$this->db = $db;
 		}
 
-
-		public function table(string $tableName) {
+		/*
+		|--------------------------------------------------------------------------
+		| Set the Database Table's Name
+		|--------------------------------------------------------------------------
+		*/
+		public function table(string $tableName):self 
+		{
 			
 			$this->table = $tableName;
 			//emptying values in case have been already used
@@ -26,81 +34,270 @@
 			return $this;
 		}
 
-		public function select(array $selectedColumn) {
+		/*
+		|--------------------------------------------------------------------------
+		| Select the Database's columns
+		|--------------------------------------------------------------------------
+		|
+		| It sets the query like this:'SELECT columnName FROM tableName'
+		| 
+		*/
+		public function select(array $selectedColumn):self 
+		{
+			$query = "SELECT @colName FROM @tableName";
 			$selectedColumn = implode(',',$selectedColumn);
-			$this->query = 'SELECT ' . $selectedColumn . ' FROM '. $this->table;
+			$placeholdersValues = [
+				"@colName" => $selectedColumn, 
+				"@tableName" => $this->table, 
+			];
+			$this->query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+
 			return $this;
 		}
 
-		public function create(array $values) {
-			foreach ($values as $key => $value) {
-				$columnName = $key;
-
-				$separator = count($updateColumns) > $loopIndex ? ',' : '';
+	    /*
+	    |--------------------------------------------------------------------------
+	    | Build the CREATE query
+	    |--------------------------------------------------------------------------
+	    |
+	    | It sets the query like this:
+	    | INSERT INTO tableName (columnName) VALUES (:columnName)
+	    | or
+	    | INSERT INTO tableName (col1,col2) VALUES (:col1,:col2)
+	    */
+		public function create(array $values):self
+		{
+			// NEED REFACTOR: LOOK UPDATE METHOD
+			$query = "INSERT INTO @tableName (@colName) VALUES (@bindedCol)";
+			$this->extractBindedValue($values);
+			$columnsName = array_keys($values);
+			$columnsSeparatedByCommma = $this->separateElementsByComma($columnsName);
+			$bindedValues = [];
+			foreach ($columnsName as $name) {
+				$name = ':'. $name;
+				array_push($bindedValues, $name);
 			}
-			$query = 'INSERT INTO ' . $this->table . '(' ;
-			var_dump($values);
+			$bindedColumnsSeparatedByCommma = $this->separateElementsByComma($bindedValues);
+
+			$placeholdersValues = [
+				"@tableName" => $this->table, 
+				"@colName" => $columnsSeparatedByCommma,
+				"@bindedCol" => $bindedColumnsSeparatedByCommma
+			];
+			$this->query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+			$this->RunQuery();
+			return $this;
+		}
+		
+		/*
+	    |--------------------------------------------------------------------------
+	    | Build the UPDATE query
+	    |--------------------------------------------------------------------------
+	    |
+	    | It sets the query like this:
+	    | UPDATE tableName SET columnName=:columnName
+	    | or
+	    | UPDATE tableName SET col1=:col1,col2=:col2
+	    */
+		public function update(array $updateColumns):self
+		{
+			// NEED REFACTOR: LOOK UPDATE METHOD
+			$query = "UPDATE @tableName SET @colName";
+			$this->extractBindedValue($updateColumns);
+			$columnsName = array_keys($updateColumns);
+			$bindedValues = [];
+			foreach ($columnsName as $name) {
+				$name = $name . '=:' . $name;
+				array_push($bindedValues, $name);
+			}
+			$columnsSeparatedByCommma = $this->separateElementsByComma($bindedValues);
+			$placeholdersValues = [
+				"@tableName" => $this->table, 
+				"@colName" => $columnsSeparatedByCommma
+			];
+			$query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+			$this->query = $query . $this->query;
+			$this->RunQuery();
 			return $this;
 		}
 
-		public function update(array $updateColumns) {
-			$query = 'UPDATE ' . $this->table . ' SET ';
-			$query = $this->extractBindedValue($updateColumns, $query);
+		/*
+		|--------------------------------------------------------------------------
+		| Build the DELETE query
+		|--------------------------------------------------------------------------
+		|
+		| It sets the query like this:
+		| "DELETE FROM tableName" plus the already existing query
+		| 
+		|
+		*/
+		public function delete():self 
+		{	
+			$query = "DELETE FROM @tableName";
+			$placeholdersValues = [
+				"@tableName" => $this->table
+			];
+			$query = $this->replacePlaceholdersInString($query, $placeholdersValues);
 			$this->query = $query . $this->query;
 			return $this;
 		}
 
-		private function extractBindedValue(array $columns, string $query) {
+		/*
+	    |--------------------------------------------------------------------------
+	    | Build the WHERE clause
+	    |--------------------------------------------------------------------------
+	    |
+	    | It sets the query like this:
+	    | Existing Query plus 'WHERE'
+	    | 
+	    | 
+	    */
+
+		public function where(string $column, string $param, $value):self
+		{
+			$query = " @whereOrAnd @column@param@bindedValue";
+			$bindValue = ':' . $column;
+			$this->bindedValues[$bindValue] = $value;
+			$clause = "WHERE";
+			if (count($this->bindedValues) >= 2) {
+				$clause = "AND";
+			}
+			$placeholdersValues = [
+				"@whereOrAnd" => $clause,
+				"@column" => $column,
+				"@param" => $param,
+				"@bindedValue" => $bindValue
+			];
+			$query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+			$this->query .= $query;
+
+			return $this;
+		}
+
+		public function get():void 
+		{
+			$this->setDbMethod('get');
+			$this->RunQuery();
+		}
+
+		public function first():void
+		{
+			$this->setDbMethod('first');
+			$this->RunQuery();
+		}
+
+
+		/*
+	    |--------------------------------------------------------------------------
+	    | Call Database Class and send to it the final Query
+	    |--------------------------------------------------------------------------
+	    */
+		public function RunQuery() 
+		{
+			// Prepare Statement
+			$this->db->query($this->query);
+			// Bind Values
+			$this->bindValues($this->db);
+			switch ($this->dbMethod) {
+				case 'get':
+					$result = $this->db->get();
+					break;
+				case 'first':
+					$result = $this->db->first();
+				default:
+					$result = $this->db->execute();
+					$this->affectedRows = $result;
+					break;
+			}
+
+			return $result;
+		} 
+
+		/*
+	    |--------------------------------------------------------------------------
+	    | Set an array containing the column's name prefixed with ':' its own value. 
+	    | The array will be used to bind the values before the query execution
+	    |--------------------------------------------------------------------------
+	    |
+	    | It sets an array ($this->bindedValues) containing columns name as Key with 	 | the related value.
+	    |
+	    | 
+	    */
+		private function extractBindedValue(array $columns):void 
+		{
 			$loopIndex = 0;
+			$values = '';
 			foreach ($columns as $key => $value) {
 					$loopIndex++;
 					$columnName = $key;
 					$bindValue = ':' . $columnName;
 					$this->bindedValues[$bindValue] = $value;
-					// If the numbers of elements inside the $updateColumns array is still greater than $loopIndex, a comma will separate the columns. Otherwise it will be set as empty. (title=:title,name=:name,etc.)
-					$separator = count($columns) > $loopIndex ? ',' : '';
-					$query .= $columnName . '=' . $bindValue . $separator;
 			}
-			return $query;
 		}
 
-		public function get() {
-			echo $this->query;
-		}
-
-		public function delete() {
-			$this->query = 'DELETE FROM ' . $this->table . $this->query;
-
-			return $this;
-		}
-
-		public function where(string $column, string $param, $value) {
-			$bindValue = ':' . $column;
-			$this->bindedValues[$bindValue] = $value;
-			if (count($this->bindedValues) < 2) {
-				// TO REFACTOR
-				$this->query .= ' WHERE ' . $column . $param . $bindValue;
-			}else{
-				$this->query .= ' AND ' . $column . $param . $bindValue;
-			}
-
-			return $this;
-		}
-
-		public function query() {
-			$db = new Database;
-			// Prepare Statement
-			$db->query($this->query);
-			// Bind Values
+		private function bindValues(Database $db) 
+		{
 			foreach ($this->bindedValues as $key => $value) {
 				$db->bind($key, $value);
 			}
-
-
-			//ok until here
-			$result = $db->execute();
-
-			return $result;
-
 		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| Separate array's elements by a comma
+		|--------------------------------------------------------------------------
+		|
+		| Given an array it returns a string with all the elements separated by a comma
+		| Input: [3,4,5]
+		| Output: '3,4,5'
+		|
+		*/
+
+		private function separateElementsByComma(array $values):string 
+		{
+			// If the numbers of elements inside the $columns array is still greater than $loopIndex, a comma will separate the columns. Otherwise it will be set as empty. (title=:title,name=:name,etc.)
+			$loopIndex = 0;
+			$valuesSeparatedByCommma = '';
+			foreach ($values as $value) {
+				$loopIndex++;
+				$separator = count($values) > $loopIndex ? ',' : '';
+				$valuesSeparatedByCommma .= $value . $separator;
+			}
+			return $valuesSeparatedByCommma;
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| Set $this->dbMethod to the given value. It will be passed to Database Class
+		|--------------------------------------------------------------------------
+		|
+		| The Database Class can know which method must call.
+		| Examples:
+		| 'get' will call the get() method of Database Class.
+		| 'first' will call the first() method of Database Class.
+		| 'execute' will call the execute() method of Database Class.
+		*/
+		private function setDbMethod(string $method):void
+		{
+			$this->dbMethod = $method;
+		}
+
+		/*
+		|--------------------------------------------------------------------------
+		| Replace placeholders of the given string with values of an array
+		|--------------------------------------------------------------------------
+		|
+		| Input: "string with @placeholder"
+		| Output: "string with value"
+		| 
+		|
+		*/
+
+		private function replacePlaceholdersInString(string $query, array $values):string
+		{
+			$query = strtr($query, $values);
+			
+			return $query;
+		}
+
 	}

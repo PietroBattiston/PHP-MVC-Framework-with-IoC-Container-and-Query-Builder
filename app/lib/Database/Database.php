@@ -14,9 +14,10 @@
 		private $statement;
 		private $DBHandler;
 		private $error;
-	
 
-		function __construct() {
+
+		function __construct() 
+		{
 
 			$conn = 'mysql:host=' . $this->dbHost . ';dbname=' . $this->dbName;
 			$options = [
@@ -33,11 +34,13 @@
 			}
 		}
 
-		public function query($sql) {
+		public function query($sql)
+		{
 			$this->statement = $this->DBHandler->prepare($sql);
 		}
 
-		public function bind($param, $value, $type = NULL) {
+		public function bind($param, $value, $type = NULL)
+		{
 			switch (is_null($type)) {
 				case is_int($value):
 					$type = PDO::PARAM_INT;
@@ -57,17 +60,26 @@
 		}
 
 
-		public function execute() {
-			return $this->statement->execute();
+		public function execute()
+		{
+			$this->statement->execute();
+			return $this->rowCount();
 		}
 
-		public function get() {
+		public function get()
+		{
 			$this->execute();
 			return $this->statement->fetchAll(PDO::FETCH_OBJ);
 		}
 
-		public function first() {
+		public function first()
+		{
 			$this->execute();
 			return $this->statement->fetch(PDO::FETCH_OBJ);
+		}
+
+		public function rowCount()
+		{
+			return $this->statement->rowCount();
 		}
 	}

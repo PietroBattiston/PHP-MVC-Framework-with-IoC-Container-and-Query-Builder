@@ -31,31 +31,27 @@
 			$result = $this->db->table('posts')
 						->select(['*'])
 						->where('id','=', $id)
-						->query();
+						->get();
 
 			return $result;
 		}
 
-		public function create(string $title) 
+		public function create(array $values) 
 		{
         	$post = $this->db
         				->table('posts')
-						->where('id','=', $id)
-						->query();
-
-			return $result;
-
-        	$this->db->execute();
+						->create($values);
+			return $post->affectedRows;
 		}
 
 		public function update(int $id, array $newValues) 
 		{
-			$newTitle = $newValues['title'];
+
 			$post = $this->db
 						->table('posts')
 						->where('id','=', $id)
-						->update(['title' => $newTitle])
-						->query();
+						->update(['title' => $newValues['title']]);
+			return $post->affectedRows;
 		}
 
 		public function delete(int $id) 
