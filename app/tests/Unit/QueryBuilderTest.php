@@ -4,14 +4,13 @@ use App\lib\Database\DB;
 use App\lib\Database\Database;
 
 
-// Select Table
-
 
 final class QueryBuilderTest extends TestCase
 {
     public function setUp():void {
         $this->loadConfig = require_once '../app/config/config.php';
-        $this->dbMock = $this->getMockBuilder(Database::class)->getMock();
+       // $this->dbMock = $this->getMockBuilder(Database::class)->getMock();
+        $this->dbMock = $this->createMock(Database::class);
         $this->tableName = 'myTable';
     }
 
@@ -146,7 +145,7 @@ final class QueryBuilderTest extends TestCase
     //      $QB->first();
     //      $this->assertEquals($QB->dbMethod, 'first');
     // }
-    // public function test_replacePlaceholdersInString(): void {
+    // public function test_replacePlaceholders(): void {
     //      $QB = new DB($this->dbMock);
     //      $query = "Hello @name today is @day";
     //      $array = [
@@ -154,7 +153,7 @@ final class QueryBuilderTest extends TestCase
     //         "@day" => 'saturday'
     //      ];
     //      $expectedQuery = "Hello pietro today is saturday";
-    //      $replace = $QB->replacePlaceholdersInString($query, $array);
+    //      $replace = $QB->replacePlaceholders($query, $array);
     //      $this->assertEquals($replace, $expectedQuery);
     // }
 

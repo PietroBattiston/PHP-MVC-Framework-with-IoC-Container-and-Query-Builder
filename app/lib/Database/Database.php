@@ -6,10 +6,10 @@
 
 	class Database implements DatabaseInterface
 	{
-		private $dbHost = DB_HOST;
-		private $dbUser = DB_USER;
-		private $dbPass = DB_PASS;
-		private $dbName = DB_NAME;
+		private $dbHost;
+		private $dbUser;
+		private $dbPass;
+		private $dbName;
 
 		private $statement;
 		private $DBHandler;
@@ -18,6 +18,11 @@
 
 		function __construct() 
 		{
+			$this->dbHost = $_ENV['DB_HOST'];
+			$this->dbUser = $_ENV['DB_USER'];
+			$this->dbPass = $_ENV['DB_PASS'];
+			$this->dbName = $_ENV['DB_NAME'];
+
 
 			$conn = 'mysql:host=' . $this->dbHost . ';dbname=' . $this->dbName;
 			$options = [

@@ -14,7 +14,6 @@ use App\Http\RouteList;
 		public $params = [];
 		
 		function __construct(RouteList $routeList) {
-
 			$this->controller = 'PagesController';
 			$this->method = 'Page404';
 			$this->routeList = $routeList->routes();

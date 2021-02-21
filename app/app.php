@@ -11,36 +11,58 @@
 	
 
 	
-	// Create and Build Container 
+	/*
+	|--------------------------------------------------------------------------
+	| Create and build the IoC Container
+	|--------------------------------------------------------------------------
+	|https://github.com/PHP-DI/PHP-DI
+	|
+	*/
 	$containerBuilder = new ContainerBuilder;
 	$container = $containerBuilder->build();
 
+	/*
+	|--------------------------------------------------------------------------
+	| Load Enviroment Configurations (.env)
+	|--------------------------------------------------------------------------
+	|
+	|https://github.com/vlucas/phpdotenv
+	|
+	*/
 
-	//Load routes list
+	$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+	$dotenv->load();
+
+
+	/*
+	|--------------------------------------------------------------------------
+	| Load Routes list
+	|--------------------------------------------------------------------------
+	*/
 	$routes = new RouteList;
-	//Init Router and 'feed' it with the routes
+
+	/*
+	|--------------------------------------------------------------------------
+	| Init Router and 'feed' it with the routes
+	|--------------------------------------------------------------------------
+	*/
 	$router = new Router($routes);
 
+	/*
+	|--------------------------------------------------------------------------
+	| Extract Controller and Method
+	|--------------------------------------------------------------------------
+	*/
 	$controller = [
 		$router->controller,
 		$router->method,
 	];
 
 	var_dump($controller);
-	// Call Controller
-	//$container->call($controller);
-
-	// Call Controller
-	//$container->call($controller, [32]);
-
+	
+	/*
+	|--------------------------------------------------------------------------
+	| Call Controller and method
+	|--------------------------------------------------------------------------
+	*/
 	$container->call($controller, [$router->params]);
-
-// use DI\ContainerBuilder;
-// use App\lib\DB;
-// $class = 'User';
-// $containerBuilder = new ContainerBuilder();
-// $containerBuilder->addDefinitions(__DIR__.'/config/php-di-config.php');
-
-// $container = $containerBuilder->build();
-
-// $container->get('DB');

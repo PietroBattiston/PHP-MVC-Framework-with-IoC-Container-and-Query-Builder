@@ -15,9 +15,10 @@
 		public function getAll():array
 		{
 			//$this->db->query('SELECT * FROM posts');
-			$result = $this->db->table('posts')
+			$result = $this->db
+						->table('posts')
 						->select(['*'])
-						->query();
+						->get();
 			return $result;
 		}
 
@@ -28,7 +29,8 @@
 			//$this->db->bind(':id', $id);
 
 			//$result = $this->db->first();
-			$result = $this->db->table('posts')
+			$result = $this->db
+						->table('posts')
 						->select(['*'])
 						->where('id','=', $id)
 						->get();

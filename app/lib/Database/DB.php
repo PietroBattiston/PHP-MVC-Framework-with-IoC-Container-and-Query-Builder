@@ -50,7 +50,7 @@
 				"@colName" => $selectedColumn, 
 				"@tableName" => $this->table, 
 			];
-			$this->query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+			$this->query = $this->replacePlaceholders($query, $placeholdersValues);
 
 			return $this;
 		}
@@ -67,10 +67,10 @@
 	    */
 		public function create(array $values):self
 		{
-			// NEED REFACTOR: LOOK UPDATE METHOD
+			/// NEED REFACTOR: LOOK UPDATE METHOD
 			$query = "INSERT INTO @tableName (@colName) VALUES (@bindedCol)";
 			$this->extractBindedValue($values);
-			$columnsName = array_keys($values);
+			$columnsName = $this->getColsName($values);
 			$columnsSeparatedByCommma = $this->separateElementsByComma($columnsName);
 			$bindedValues = [];
 			foreach ($columnsName as $name) {
@@ -84,7 +84,7 @@
 				"@colName" => $columnsSeparatedByCommma,
 				"@bindedCol" => $bindedColumnsSeparatedByCommma
 			];
-			$this->query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+			$this->query = $this->replacePlaceholders($query, $placeholdersValues);
 			$this->RunQuery();
 			return $this;
 		}
@@ -101,10 +101,11 @@
 	    */
 		public function update(array $updateColumns):self
 		{
+
 			// NEED REFACTOR: LOOK UPDATE METHOD
 			$query = "UPDATE @tableName SET @colName";
 			$this->extractBindedValue($updateColumns);
-			$columnsName = array_keys($updateColumns);
+			$columnsName = $this->getColsName($updateColumns);
 			$bindedValues = [];
 			foreach ($columnsName as $name) {
 				$name = $name . '=:' . $name;
@@ -115,7 +116,7 @@
 				"@tableName" => $this->table, 
 				"@colName" => $columnsSeparatedByCommma
 			];
-			$query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+			$query = $this->replacePlaceholders($query, $placeholdersValues);
 			$this->query = $query . $this->query;
 			$this->RunQuery();
 			return $this;
@@ -137,7 +138,7 @@
 			$placeholdersValues = [
 				"@tableName" => $this->table
 			];
-			$query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+			$query = $this->replacePlaceholders($query, $placeholdersValues);
 			$this->query = $query . $this->query;
 			return $this;
 		}
@@ -152,7 +153,6 @@
 	    | 
 	    | 
 	    */
-
 		public function where(string $column, string $param, $value):self
 		{
 			$query = " @whereOrAnd @column@param@bindedValue";
@@ -168,22 +168,22 @@
 				"@param" => $param,
 				"@bindedValue" => $bindValue
 			];
-			$query = $this->replacePlaceholdersInString($query, $placeholdersValues);
+			$query = $this->replacePlaceholders($query, $placeholdersValues);
 			$this->query .= $query;
 
 			return $this;
 		}
 
-		public function get():void 
+		public function get():array 
 		{
 			$this->setDbMethod('get');
-			$this->RunQuery();
+			return $this->RunQuery();
 		}
 
-		public function first():void
+		public function first():array
 		{
 			$this->setDbMethod('first');
-			$this->RunQuery();
+			return $this->RunQuery();
 		}
 
 
@@ -209,9 +209,21 @@
 					$this->affectedRows = $result;
 					break;
 			}
-
 			return $result;
-		} 
+		}
+
+
+		/*
+		|--------------------------------------------------------------------------
+		| Get column's name
+		|--------------------------------------------------------------------------
+		*/
+		
+		private function getColsName(array $cols):array 
+		{
+			$columnsName = array_keys($cols);
+			return $columnsName;
+		}
 
 		/*
 	    |--------------------------------------------------------------------------
@@ -235,10 +247,10 @@
 			}
 		}
 
-		private function bindValues(Database $db) 
+		private function bindValues() 
 		{
 			foreach ($this->bindedValues as $key => $value) {
-				$db->bind($key, $value);
+				$this->db->bind($key, $value);
 			}
 		}
 
@@ -252,7 +264,6 @@
 		| Output: '3,4,5'
 		|
 		*/
-
 		private function separateElementsByComma(array $values):string 
 		{
 			// If the numbers of elements inside the $columns array is still greater than $loopIndex, a comma will separate the columns. Otherwise it will be set as empty. (title=:title,name=:name,etc.)
@@ -284,7 +295,7 @@
 
 		/*
 		|--------------------------------------------------------------------------
-		| Replace placeholders of the given string with values of an array
+		| Replace placeholders inside the given string with values of an array
 		|--------------------------------------------------------------------------
 		|
 		| Input: "string with @placeholder"
@@ -293,7 +304,7 @@
 		|
 		*/
 
-		private function replacePlaceholdersInString(string $query, array $values):string
+		private function replacePlaceholders(string $query, array $values):string
 		{
 			$query = strtr($query, $values);
 			
