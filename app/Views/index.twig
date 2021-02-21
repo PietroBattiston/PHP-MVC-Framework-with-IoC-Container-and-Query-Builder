@@ -1,0 +1,20 @@
+{% extends 'layouts/layout.twig' %}
+
+{% block content %}
+
+    <h1>Homepage</h1>
+
+    <ul class="collection">
+
+        {% for post in posts %}
+                <span class="title">{{ post.title }}</span>
+
+
+                <p><a href="/show/{{ post.id }}">Read more</a></p>
+
+            </li>
+        {% endfor %}
+
+    </ul>
+
+{% endblock %}

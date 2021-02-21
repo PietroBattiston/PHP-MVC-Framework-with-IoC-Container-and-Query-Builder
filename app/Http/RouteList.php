@@ -9,7 +9,7 @@ namespace App\Http;
 		public function routes() {
 			 $routeList = [
             'GET' => [
-                'url' => 'ExampleController@index',
+                '/' => 'ExampleController@index',
                 'show/{$param}' => 'ExampleController@show',
                 'delete/{$id}' => 'ExampleController@delete',
             ],

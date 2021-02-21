@@ -9,7 +9,7 @@ final class RouterTest extends TestCase
 {
     public function setUp():void {
 
-        $this->loadConfig = require_once '../app/config/config.php';
+       // $this->loadConfig = require_once '../app/config/config.php';
         $_SERVER["REQUEST_METHOD"] = 'GET';
         $this->requestMethod = $_SERVER["REQUEST_METHOD"];
         $this->routeList = [

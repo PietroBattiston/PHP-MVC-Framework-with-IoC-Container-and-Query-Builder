@@ -7,18 +7,18 @@
 	// Load Composer Autoloader
 	require __DIR__ . '/vendor/autoload.php';
 	// Load Config File
-	require_once '../app/config/config.php';
 	
 
 	
 	/*
 	|--------------------------------------------------------------------------
-	| Create and build the IoC Container
+	| Create and build the IoC Container with config
 	|--------------------------------------------------------------------------
 	|https://github.com/PHP-DI/PHP-DI
 	|
 	*/
 	$containerBuilder = new ContainerBuilder;
+	$containerBuilder->addDefinitions(__DIR__.'/config/php-di-config.php');
 	$container = $containerBuilder->build();
 
 	/*
@@ -29,7 +29,6 @@
 	|https://github.com/vlucas/phpdotenv
 	|
 	*/
-
 	$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 	$dotenv->load();
 

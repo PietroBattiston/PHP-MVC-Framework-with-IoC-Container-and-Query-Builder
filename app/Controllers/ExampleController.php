@@ -1,19 +1,23 @@
 <?php declare(strict_types=1);
 	namespace App\Controllers;
+	use Twig\Environment;
+
 	use App\lib\BaseController;
 	use App\Models\ModelExample;
 	
 
 	class ExampleController extends BaseController 
 	{
-	    public function __construct(ModelExample $model) {
+	    public function __construct(ModelExample $model, Environment $twig) {
 	        $this->model = $model;
+	        $this->twig = $twig;
 	    }
 
 	    public function index()
 	    {
 	    	$posts = $this->model->getAll();
-	    	return $posts;
+
+	    	$this->view('index', 'posts', $posts);
 	    }
 
 	    public function testParam($param)
@@ -23,7 +27,8 @@
 
 	    public function show($param)
 	    {
-	       $result = $this->model->show(intval($param));
+	       $post = $this->model->show(intval($param));
+	       $this->view('post', 'post', $post);
 
 	    }
 

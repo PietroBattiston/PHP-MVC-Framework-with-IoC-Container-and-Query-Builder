@@ -2,10 +2,19 @@
 
 use App\lib\QueryBuilder;
 use function DI\create;
-//require_once __DIR__.'/User.php';
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 use App\lib\DB;
 
+// return [
+//   'DB' => create(DB::class),
+//   'QueryBuilder' => create(QueryBuilder::class)
+// ];
 return [
-  'DB' => create(DB::class),
-  'QueryBuilder' => create(QueryBuilder::class)
+    // Configure Twig
+    Environment::class => function () {
+        $loader = new FilesystemLoader(__DIR__ . '/../Views');
+        
+        return new Environment($loader);
+    },
 ];

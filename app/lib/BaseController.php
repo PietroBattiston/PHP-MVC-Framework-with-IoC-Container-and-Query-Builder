@@ -9,12 +9,12 @@
 			return new $model;
 		}
 
-		protected function view($view, $data = []) {
-			if (file_exists('../app/Views/' . $view . '.view.php')) {
-				require_once('../app/Views/' . $view . '.view.php');
-			}else{
-				die(`View $view does not exist`);
-			}
+		protected function view(string $view, string $dataName, array $data = []) {
+			//echo $this->twig->render('index.twig', [
+			$view = $view . '.twig';
+			echo $this->twig->render($view, [
+            	$dataName => $data,
+        	]);
 		}
 	}
 

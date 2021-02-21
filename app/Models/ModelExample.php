@@ -25,10 +25,6 @@
 		public function show(int $id) 
 		{
 			$post = 'posts';
-			//$this->db->query('SELECT * FROM posts WHERE id=:id');
-			//$this->db->bind(':id', $id);
-
-			//$result = $this->db->first();
 			$result = $this->db
 						->table('posts')
 						->select(['*'])

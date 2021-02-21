@@ -8,7 +8,6 @@ use App\lib\Database\Database;
 final class QueryBuilderTest extends TestCase
 {
     public function setUp():void {
-        $this->loadConfig = require_once '../app/config/config.php';
        // $this->dbMock = $this->getMockBuilder(Database::class)->getMock();
         $this->dbMock = $this->createMock(Database::class);
         $this->tableName = 'myTable';
