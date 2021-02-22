@@ -4,6 +4,5 @@
 
 	interface DatabaseInterface
 	{
-		public function query($sql);
-		public function execute();
+		
 	}

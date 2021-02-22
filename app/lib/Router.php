@@ -3,17 +3,19 @@
 namespace App\lib;
 
 use App\Http\RouteList;
+use App\lib\Request\RequestInterface;
 
 
 	class Router {
-		private $currentUrl;
+		private $currentUrl = [];
 		private $routeList;
 		private $requestMethod = '';
 		public $controller;
 		public $method;
 		public $params = [];
 		
-		function __construct(RouteList $routeList) {
+		function __construct(RouteList $routeList, RequestInterface $request) {
+			$this->request = $request;
 			$this->controller = 'PagesController';
 			$this->method = 'Page404';
 			$this->routeList = $routeList->routes();
@@ -30,16 +32,23 @@ use App\Http\RouteList;
 			// call_user_func_array([new $controllersAndNamespace, $this->method], [$this->params]);
 		}
 
-		public function getUrl():array {
-			if (isset($_SERVER["REQUEST_URI"]) && isset($_SERVER["REQUEST_METHOD"])) {
-				$this->currentUrl = $_SERVER["REQUEST_URI"];
-				$this->requestMethod = $_SERVER["REQUEST_METHOD"];
+		public function getUrl():array
+		{
+			if (!empty($this->request->getURI()) && !empty($this->request->getMethod())) {
+				$this->currentUrl = $this->request->getURI();
+				$this->requestMethod = $this->getRequestMethod();
 				$this->currentUrl = trim($this->currentUrl, '/');
 				$this->currentUrl = filter_var($this->currentUrl, FILTER_SANITIZE_URL);
 				$this->currentUrl = $this->explode('/',$this->currentUrl);
-				//return $this->currentUrl;
 			}
+
 			return $this->currentUrl;
+		}
+
+		private function getRequestMethod()
+		{
+			return $this->request->getMethod();
+			
 		}
 
 		public function searchInRouteList(array $routeListKeys):string {

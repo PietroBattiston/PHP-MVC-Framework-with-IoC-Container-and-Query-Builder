@@ -5,22 +5,27 @@ use App\lib\Database\Database;
 
 
 
+
 final class QueryBuilderTest extends TestCase
 {
     public function setUp():void {
-       // $this->dbMock = $this->getMockBuilder(Database::class)->getMock();
+        //$this->dbMock = $this->getMockBuilder('App\lib\Database\Database')->setMethods(['foo'])->getMock();
+
         $this->dbMock = $this->createMock(Database::class);
+
         $this->tableName = 'myTable';
     }
 
-    public function test_a_table_can_be_selected(): void {
+    public function test_a_table_can_be_selected(): void
+    {
          $QB = new DB($this->dbMock);
          $QB->table($this->tableName);
 
          $this->assertEquals($QB->table, $this->tableName);
     }
 
-    public function test_CREATE_query_can_be_built(): void {
+    public function test_CREATE_query_can_be_built(): void
+    {
         $QB = new DB($this->dbMock);
         $QB->table = $this->tableName;
         $values = [
@@ -36,7 +41,8 @@ final class QueryBuilderTest extends TestCase
 
     }
 
-    public function test_CREATE_query_can_be_built_with_multiple_params(): void {
+    public function test_CREATE_query_can_be_built_with_multiple_params(): void
+    {
         $QB = new DB($this->dbMock);
         $QB->table = $this->tableName;
         $values = [
@@ -56,9 +62,14 @@ final class QueryBuilderTest extends TestCase
 
     }
 
-    public function test_UPDATE_query_can_be_built(): void {
+    public function test_UPDATE_query_can_be_built(): void
+    {
          $QB = new DB($this->dbMock);
          $QB->table = $this->tableName;
+         $this->dbMock
+                ->expects($this->once())
+                ->method("execute")
+                ->willReturn(1);
          $newTitle  = 'myTitle';
          $QB->update([
             'title' => $newTitle
@@ -72,9 +83,16 @@ final class QueryBuilderTest extends TestCase
 
     }
 
-    public function test_UPDATE_query_must_contains_multiple_binded_elements_divided_by_a_comma(): void {
+    public function test_UPDATE_query_must_contains_multiple_binded_elements_divided_by_a_comma(): void
+    {
+
          $QB = new DB($this->dbMock);
          $QB->table = $this->tableName;
+         $this->dbMock
+                ->expects($this->once())
+                ->method("execute")
+                ->willReturn(1);
+
          $newTitle  = 'myTitle';
          $QB->update([
             'title' => $newTitle,
@@ -90,9 +108,14 @@ final class QueryBuilderTest extends TestCase
 
     }
 
-    public function test_DELETE_query_can_be_built(): void {
+    public function test_DELETE_query_can_be_built(): void
+    {
          $QB = new DB($this->dbMock);
          $QB->table = $this->tableName;
+         $this->dbMock
+                ->expects($this->once())
+                ->method("execute")
+                ->willReturn(1);
          $QB->delete();
          $expectedQuery = 'DELETE FROM ' . $this->tableName;
          $this->assertEquals($QB->query, $expectedQuery);
@@ -100,7 +123,8 @@ final class QueryBuilderTest extends TestCase
 
     }
 
-    public function test_WHERE_clause_can_be_built(): void {
+    public function test_WHERE_clause_can_be_built(): void
+    {
          $QB = new DB($this->dbMock);
          $QB->table = $this->tableName;
          $QB->where('id', '=', 32);
@@ -108,7 +132,8 @@ final class QueryBuilderTest extends TestCase
          $this->assertEquals($QB->query, $expectedQuery);
     }
 
-    public function test_multiple_WHERE_clauses_must_be_separated_by_AND(): void {
+    public function test_multiple_WHERE_clauses_must_be_separated_by_AND(): void
+    {
          $QB = new DB($this->dbMock);
          $QB->table = $this->tableName;
          $QB->where('id', '=', 32);
@@ -125,11 +150,20 @@ final class QueryBuilderTest extends TestCase
          $this->assertEquals($QB->query, $expectedQuery);
     }
 
-    public function test_selecting_multiple_column_must_return_col_separated_by_comma(): void {
+    public function test_selecting_multiple_column_must_return_col_separated_by_comma(): void
+    {
          $QB = new DB($this->dbMock);
          $QB->table = $this->tableName;
          $QB->select(['title, id']);
          $expectedQuery = 'SELECT title, id FROM ' . $this->tableName;
+         $this->assertEquals($QB->query, $expectedQuery);
+    }
+
+    public function test_LIMIT_clause_can_be_built(): void
+    {
+         $QB = new DB($this->dbMock);
+         $QB->limit(2);
+         $expectedQuery = ' LIMIT 2';
          $this->assertEquals($QB->query, $expectedQuery);
     }
 

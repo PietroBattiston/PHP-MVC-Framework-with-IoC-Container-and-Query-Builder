@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 	namespace App\lib\Database;
-	use App\lib\Database\DB;
 	use \PDO;
 
 	class Database implements DatabaseInterface

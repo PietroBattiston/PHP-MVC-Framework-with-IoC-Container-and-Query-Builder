@@ -57,7 +57,8 @@
 			$post = $this->db
 						->table('posts')
 						->where('id','=', $id)
-						->delete()
-						->query();
+						->delete();
+			var_dump($post);
+			return $post;
 		}
 	}

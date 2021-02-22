@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 	namespace App\lib\Database;
-	use App\lib\Database\Database;
 
 
 	class DB
@@ -99,7 +98,7 @@
 	    | or
 	    | UPDATE tableName SET col1=:col1,col2=:col2
 	    */
-		public function update(array $updateColumns):self
+		public function update(array $updateColumns):int
 		{
 
 			// NEED REFACTOR: LOOK UPDATE METHOD
@@ -118,8 +117,8 @@
 			];
 			$query = $this->replacePlaceholders($query, $placeholdersValues);
 			$this->query = $query . $this->query;
-			$this->RunQuery();
-			return $this;
+
+			return $this->RunQuery();
 		}
 
 		/*
@@ -132,7 +131,7 @@
 		| 
 		|
 		*/
-		public function delete():self 
+		public function delete():int
 		{	
 			$query = "DELETE FROM @tableName";
 			$placeholdersValues = [
@@ -140,7 +139,8 @@
 			];
 			$query = $this->replacePlaceholders($query, $placeholdersValues);
 			$this->query = $query . $this->query;
-			return $this;
+
+			return $this->RunQuery();
 		}
 
 		/*
@@ -170,6 +170,17 @@
 			];
 			$query = $this->replacePlaceholders($query, $placeholdersValues);
 			$this->query .= $query;
+
+			return $this;
+		}
+
+		public function limit(int $value):self
+		{	$query = ' LIMIT @value';
+			$placeholdersValues = [
+				'@value' => $value
+			];
+			$query = $this->replacePlaceholders($query, $placeholdersValues);
+			$this->query.= $query;
 
 			return $this;
 		}

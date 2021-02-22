@@ -2,6 +2,7 @@
 use PHPUnit\Framework\TestCase;
 use App\lib\Router;
 use App\Http\RouteList;
+use App\lib\Request\Request;
 
 
 
@@ -19,27 +20,39 @@ final class RouterTest extends TestCase
                 'url/url1/{param}' => 'ExampleController@index'
             ]
         ];
-        $this->stub = $this->createStub(RouteList::class);
 
-        // Configure the stub.
-        $this->stub->method('routes')
-             ->willReturn($this->routeList);
+        // Create Routes Stub
+        $this->routesStub = $this->createStub(RouteList::class);
 
-        //$this->router = new Router($this->stub);
+        // Configure Routes stub.
+        $this->routesStub
+            ->method('routes')
+            ->willReturn($this->routeList);
+
+
+        $this->requestStub = $this->createStub(Request::class);
+        $this->requestStub
+                ->method('getMethod')
+                ->willReturn('GET');
         $this->router = '';
     }
 
     public function test_Router_Class_exist(): void {
-        $_SERVER["REQUEST_URI"] = 'url/url/url';
-        $this->router = new Router($this->stub);
+        $this->requestStub
+                ->method('getURI')
+                ->willReturn('url/url/url');
+        $this->router = new Router($this->routesStub, $this->requestStub);
         $this->assertInstanceOf(Router::class, $this->router);
 
     }
 
     public function test_URL_can_be_catch():void {   
-        $_SERVER["REQUEST_URI"] = 'url/url/url';  
-        $explodedURL = explode("/", $_SERVER["REQUEST_URI"]);
-        $this->router = new Router($this->stub);
+       $this->requestStub
+                ->method('getURI')
+                ->willReturn('url/url/url');
+
+        $explodedURL = explode("/", $this->requestStub->getURI());
+        $this->router = new Router($this->routesStub, $this->requestStub);
         $catchedURL = $this->router->getUrl();
 
         $this->assertTrue(is_array($catchedURL));
@@ -47,14 +60,20 @@ final class RouterTest extends TestCase
     }
 
     public function test_URL_from_RouteList_can_be_extract():void {
-        $this->router = new Router($this->stub);
+        $this->requestStub
+                ->method('getURI')
+                ->willReturn('url/url/url');
+        $this->router = new Router($this->routesStub, $this->requestStub);
         $keys = $this->router->getRouteListKeys();
         
         $this->assertEquals($keys, array_keys($this->routeList[$this->requestMethod]));
 
     }
     public function test_Current_URL_can_be_searched_inside_RouteList():void {
-        $this->router = new Router($this->stub);
+      $this->requestStub
+                ->method('getURI')
+                ->willReturn('url/url/url');
+        $this->router = new Router($this->routesStub, $this->requestStub);
        $keys = $this->router->getRouteListKeys();
        $search = $this->router->searchInRouteList($keys);
 
@@ -64,10 +83,12 @@ final class RouterTest extends TestCase
 
     public function test_Controller_and_method_can_be_extract():void {
 
-        $_SERVER["REQUEST_URI"] = 'url';
-        $this->router = new Router($this->stub);
+        $this->requestStub
+                ->method('getURI')
+                ->willReturn('url');
+        $this->router = new Router($this->routesStub, $this->requestStub);
         $this->router->extractControllerAndMethod($this->routeList['GET']['url']);
-        $controllerAndMethod = explode('@', $this->routeList[$this->requestMethod][$_SERVER["REQUEST_URI"]]);
+        $controllerAndMethod = explode('@', $this->routeList[$this->requestMethod][$this->requestStub->getURI()]);
 
         $this->assertEquals($this->router->controller, $controllerAndMethod[0]);
         $this->assertEquals($this->router->method, $controllerAndMethod[1]);
@@ -75,19 +96,22 @@ final class RouterTest extends TestCase
 
     public function test_a_not_matching_route_must_call_404_method():void {
 
-        $_SERVER["REQUEST_URI"] = 'not/found';
-
-        $this->router = new Router($this->stub);
+        $this->requestStub
+                ->method('getURI')
+                ->willReturn('not/found');
+        $this->router = new Router($this->routesStub, $this->requestStub);
         
         $this->assertEquals($this->router->method, 'Page404');
     }
 
     public function test_a_param_can_be_recognized_and_extract():void {
 
-        $_SERVER["REQUEST_URI"] = 'url/url1/myparam';
-        $explodedURL = explode('/', $_SERVER["REQUEST_URI"]);
-
-        $this->router = new Router($this->stub);
+        $this->requestStub
+                ->method('getURI')
+                ->willReturn('url/url1/myparam');
+        $explodedURL = explode('/', $this->requestStub->getURI());
+        $this->router = new Router($this->routesStub, $this->requestStub);
+        
         $this->assertEquals($this->router->params, end($explodedURL));
     }
 }
