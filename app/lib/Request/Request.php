@@ -46,6 +46,16 @@
 			return $requestMethod;
 		}
 
+		public function getCookies()
+		{
+			return $this->request->getCookieParams();
+		}
+
+		public function getUploadedFiles()
+		{
+			return $this->request->getUploadedFiles();
+		}
+
 	}
 
 		

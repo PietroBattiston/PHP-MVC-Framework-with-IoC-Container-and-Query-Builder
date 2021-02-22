@@ -26,10 +26,6 @@ use App\lib\Request\RequestInterface;
 			}
 			// Add the full Namespace to Controller
 			$this->controller = 'App\Controllers\\'. $this->controller;
-
-			// $controllersAndNamespace = 'App\Controllers\\' . $this->controller;
-			// // call_user_func_array makes a static call to the method. Adding 'new' will create a proper instance of the object. Without creating the object and error will be trown in the related Class (Error: Using $this when not in obj context)
-			// call_user_func_array([new $controllersAndNamespace, $this->method], [$this->params]);
 		}
 
 		public function getUrl():array
