@@ -22,12 +22,17 @@
 			$this->dbPass = $_ENV['DB_PASS'];
 			$this->dbName = $_ENV['DB_NAME'];
 
+			$errorMode = 'PDO::ERRMODE_SILENT';
+
+			if ($_ENV['DB_ERROR_MODE'] == TRUE) {
+				$errorMode = 'PDO::ERRMODE_EXCEPTION';
+			}
 
 			$conn = 'mysql:host=' . $this->dbHost . ';dbname=' . $this->dbName;
 			$options = [
 				\PDO::ATTR_PERSISTENT=> TRUE,
 				PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-	    		PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+	    		PDO::ATTR_ERRMODE => $errorMode,
 			];
 
 			try {
