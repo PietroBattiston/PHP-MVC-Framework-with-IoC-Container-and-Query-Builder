@@ -32,7 +32,7 @@ You can define your routes inside RouteList.php
 
 //app/Http/Routelist.php
 
-			$routeList = [
+	$routeList = [
                 'GET' => [
                     '/' => 'ExampleController@index',
                 ],
@@ -45,7 +45,7 @@ You can define your routes inside RouteList.php
                 'DELETE' => [
                     'delete/{$id}' => 'ExampleController@delete',
                 ]
-            ];
+        ];
 			
 
 ``` 
@@ -63,12 +63,12 @@ You will find an ExampleController and a PageController as examples.
 // app/Controllers/ExampleController.php
 
 <?php declare(strict_types=1);
+
 	namespace App\Controllers;
 	use App\lib\BaseController;
 	use App\Models\ModelExample;
 	use Twig\Environment;
-
-
+	
 	class ExampleController extends BaseController 
 	{
 	    public function __construct(ModelExample $model, Environment $twig)
@@ -77,14 +77,12 @@ You will find an ExampleController and a PageController as examples.
 	        $this->request = $request;
 	        $this->twig = $twig;
 	    }
-
 	    public function index()
 	    {
 	    	$posts = ['First Post', 'Second Post', 'Thirth Post'];
 
 	    	$this->view('index', 'posts', $posts);
 	    }
-
 	}
 ```
 > Note: Remember to extends the BaseController in your custom Controllers!
@@ -93,14 +91,12 @@ You will find an ExampleController and a PageController as examples.
 
 // app/Controllers/PageController.php
 <?php declare(strict_types=1);
+
 	namespace App\Controllers;
-
 	use App\lib\BaseController;
-
 	
 	class PagesController extends BaseController
 	{
-		
 		public function Page404()
 		{
 			echo "404";
@@ -122,18 +118,15 @@ You will find a ModelExample as example.
 // app/Models/ModelExample.php
 <?php declare(strict_types=1);
 	namespace App\Models;
-
 	use App\lib\Database\DB;
 
 	class ModelExample 
 	{
 		private $db;
-
 		public function __construct(DB $db) 
 		{
 			$this->db = $db;
 		}
-
 	}
 ```
 > Note: Class DB is the Query Builder. Please refer to the next section.
@@ -142,30 +135,30 @@ You will find a ModelExample as example.
 The framework uses a Query Builder for simple queries. Please check some examples:
 ```php
 $results = $this->db
-				->table('posts')
-				->select(['*'])
-				->get();
+		->table('posts')
+		->select(['*'])
+		->get();
 
 
 $result = $this->db
-				->table('posts')
-				->select(['*'])
-				->where('id','=', $id)
-				->get();
+		->table('posts')
+		->select(['*'])
+		->where('id','=', $id)
+		->get();
 
 $create = $this->db
-        		->table('posts')
-				->create($values);
+        	->table('posts')
+		->create($values);
 
 $update = $this->db
-				->table('posts')
-				->where('id','=', $id)
-				->update(['title' => $newValues['title']]);
+		->table('posts')
+		->where('id','=', $id)
+		->update(['title' => $newValues['title']]);
 
 $delete = $this->db
-				->table('posts')
-				->where('id','=', $id)
-				->delete();
+		->table('posts')
+		->where('id','=', $id)
+		->delete();
 
 ```
 > Note: The QueryBuilder will call the Database class once obtained the final query. All the values are binded. Please refer to [PDO Bind Value](https://www.php.net/manual/en/pdostatement.bindvalue.php)
@@ -178,16 +171,15 @@ The framework is [PSR-7](https://www.php-fig.org/psr/psr-7/) compliant. Please c
 
 	class Controller extends BaseController 
 	{
-	    function __construct(Request $request)
-	    {
-	        $this->request = $request;
+		function __construct(Request $request)
+		{
+			$this->request = $request;
 		}
 
 		public function yourMethod()
 		{
-	    	$data = $this->request->getBody();
+			$data = $this->request->getBody();
 		}
-
 	}
 	
 ```
