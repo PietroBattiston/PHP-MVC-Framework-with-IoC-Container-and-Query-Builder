@@ -8,10 +8,6 @@ use App\lib\Database\Database;
 use App\lib\Database\DatabaseInterface;
 
 
-// return [
-//   'DB' => create(DB::class),
-//   'QueryBuilder' => create(QueryBuilder::class)
-// ];
 return [
     // Configure Twig
     Environment::class => function () {

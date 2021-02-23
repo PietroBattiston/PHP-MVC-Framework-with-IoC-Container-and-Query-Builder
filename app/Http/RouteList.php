@@ -12,7 +12,6 @@ namespace App\Http;
 			$routeList = [
                 'GET' => [
                     '/' => 'ExampleController@index',
-                    'show/{$param}' => 'ExampleController@show',
                 ],
                 'POST' => [
                     'create' => 'ExampleController@create',
