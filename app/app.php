@@ -5,12 +5,13 @@
 	use DI\ContainerBuilder;
 
 
-	// Load Composer Autoloader
-	require __DIR__ . '/vendor/autoload.php';
-	// Load Config File
-	
+	/*
+	|--------------------------------------------------------------------------
+	| Load Composer Autoloader
+	|--------------------------------------------------------------------------
+	*/
+	require __DIR__ . '/../vendor/autoload.php';
 
-	
 	/*
 	|--------------------------------------------------------------------------
 	| Create and build the IoC Container with config
@@ -32,7 +33,6 @@
 	*/
 	$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 	$dotenv->load();
-
 
 	/*
 	|--------------------------------------------------------------------------
@@ -65,8 +65,6 @@
 		$router->method,
 	];
 
-	var_dump($controller);
-	
 	/*
 	|--------------------------------------------------------------------------
 	| Call Controller and method

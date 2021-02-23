@@ -6,7 +6,8 @@ use App\Http\RouteList;
 use App\lib\Request\RequestInterface;
 
 
-	class Router {
+	class Router
+	{
 		private $currentUrl = [];
 		private $routeList;
 		private $requestMethod = '';
@@ -28,6 +29,11 @@ use App\lib\Request\RequestInterface;
 			$this->controller = 'App\Controllers\\'. $this->controller;
 		}
 
+		/*
+		|--------------------------------------------------------------------------
+		| Get the current URI, trim, sanitize, and explode it
+		|--------------------------------------------------------------------------
+		*/
 		public function getUrl():array
 		{
 			if (!empty($this->request->getURI()) && !empty($this->request->getMethod())) {
@@ -37,24 +43,34 @@ use App\lib\Request\RequestInterface;
 				$this->currentUrl = filter_var($this->currentUrl, FILTER_SANITIZE_URL);
 				$this->currentUrl = $this->explode('/',$this->currentUrl);
 			}
-
 			return $this->currentUrl;
 		}
 
+
+		/*
+		|--------------------------------------------------------------------------
+		| Get the HTTP Method
+		|--------------------------------------------------------------------------
+		*/
 		private function getRequestMethod()
 		{
 			return $this->request->getMethod();
 			
 		}
 
-		public function searchInRouteList(array $routeListKeys):string {
+		/*
+		|--------------------------------------------------------------------------
+		| Compare the Current URI with URIs set inside the Routes List
+		|--------------------------------------------------------------------------
+		*/
+		public function searchInRouteList(array $routeListKeys):string
+		{
 			$controllerAndMethod = '';
 			foreach ($routeListKeys as $key) {
 				$explodedKey = $this->explode('/',$key);
 				// Find differences between the Current URL and Routes
 				$diff = array_diff($explodedKey, $this->currentUrl);
-				// If only one element is different and this element is wrapped by {}, the element is the parameter and we have found our matching result.
-				if (count($diff) === 1 && $this->isUrlParameter($diff)) {
+				if ($this->verifyMatch($diff, $explodedKey) === TRUE) {
 					// Extract 'Controller@Method' using the matching array key
 					$controllerAndMethod = $this->routeList[$this->requestMethod][$key];
 					$this->params = end($this->currentUrl);	
@@ -66,7 +82,13 @@ use App\lib\Request\RequestInterface;
 			return $controllerAndMethod;
 		}
 
-		public function extractControllerAndMethod($controllerAndMethod):void {
+		/*
+		|--------------------------------------------------------------------------
+		| Extract Controller and Method once found a match inside Routes List
+		|--------------------------------------------------------------------------
+		*/
+		public function extractControllerAndMethod($controllerAndMethod):void
+		{
 			// Controller and Method are separated by '@'. Extract them and set the
 			// controller and method
 			$controllerAndMethod = $this->explode('@', $controllerAndMethod);
@@ -78,7 +100,8 @@ use App\lib\Request\RequestInterface;
 			return explode($delimiter, $str);
 		}
 
-		public function getRouteListKeys():array {
+		public function getRouteListKeys():array
+		{
 			$routeListKeys = [];
 			// Check if the HTTP Method of the Request is set inside RouteList
 			if (array_key_exists($this->requestMethod, $this->routeList)) {
@@ -89,7 +112,34 @@ use App\lib\Request\RequestInterface;
 			return $routeListKeys;
 		}
 
-		private function isUrlParameter(array $diff):bool {
+
+		/*
+		|--------------------------------------------------------------------------
+		| Check if the route is a real match
+		|--------------------------------------------------------------------------
+		|
+		| If there's only one different element between the current URI and the route
+		| check if that element is a parameter and if the URI and route have the same
+		| length
+		*/
+		private function verifyMatch(array $diff, array $explodedKey):bool
+		{
+			if (count($diff) === 1 && $this->isUrlParameter($diff) && count($explodedKey) === count($this->currentUrl)) {
+
+				return TRUE;
+			}
+
+			return FALSE;		
+		}	
+
+		/*
+		|--------------------------------------------------------------------------
+		| In case of one not matching element in URI, check if that element can be a
+		|  a parameter set inside the route wrapped by {}
+		|--------------------------------------------------------------------------
+		*/
+		private function isUrlParameter(array $diff):bool
+		{
 			$diff = array_values($diff)[0];
 			// Return true if the string start with "{"
 			if (strpos($diff, "{") === 0) {
@@ -97,4 +147,7 @@ use App\lib\Request\RequestInterface;
 			}
 			return false;
 		}
+
+
+
 	} 

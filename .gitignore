@@ -1,4 +1,4 @@
-/app/vendor/
+vendor/
 BUGS
 npm-debug.log
 yarn-error.log

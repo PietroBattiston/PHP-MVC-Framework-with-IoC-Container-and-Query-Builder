@@ -2,19 +2,14 @@
 
 {% block content %}
 
-    <h1>Homepage</h1>
+    <h1 style="font-size:3em; text-align: center;">MVC FRAMEWORK WITH IoC CONTAINER and Query Builder</h1>
 
-    <ul class="collection">
-
+    <ul class="collection" style="text-align: center;">
         {% for post in posts %}
-                <span class="title">{{ post.title }}</span>
-
-
-                <p><a href="/show/{{ post.id }}">Read more</a></p>
-
+        	<li>
+                <span class="title">{{ post }}</span>
             </li>
         {% endfor %}
-
     </ul>
 
 {% endblock %}

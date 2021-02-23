@@ -215,6 +215,7 @@
 					break;
 				case 'first':
 					$result = $this->db->first();
+					break;
 				default:
 					$result = $this->db->execute();
 					$this->affectedRows = $result;

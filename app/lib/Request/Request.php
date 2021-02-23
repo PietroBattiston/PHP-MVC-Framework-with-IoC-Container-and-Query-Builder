@@ -39,10 +39,9 @@
 		public function getMethod()
 		{
 			$requestMethod = $this->getServerParams()['REQUEST_METHOD'];
-			if (!empty($this->getBody()) && !isset($this->getBody()['_method'])) {
+			if (!empty($this->getBody()) && isset($this->getBody()['_method'])) {
 				$requestMethod = $this->getBody()['_method'];
 			}
-			var_dump($requestMethod);
 			return $requestMethod;
 		}
 

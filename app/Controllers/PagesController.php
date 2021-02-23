@@ -1,13 +1,14 @@
 <?php declare(strict_types=1);
 	namespace App\Controllers;
 
-	/**
-	 * 
-	 */
-	class PagesController
+	use App\lib\BaseController;
+
+	
+	class PagesController extends BaseController
 	{
 		
-		public function Page404() {
+		public function Page404()
+		{
 			echo "404";
 		}
 	}
