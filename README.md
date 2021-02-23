@@ -3,10 +3,10 @@
 This framework is suitable for small projects. It has few (but nice) features. If you think you need more features you should probably choose an advanced framework.
 
 ### Features
-	- Query Builder
-	- Routing
-	- Views
-	- Dependency Injection Container
+- Query Builder
+- Routing
+- Views
+- Dependency Injection Container
 
 
 ## Installation
