@@ -162,7 +162,7 @@ $delete = $this->db
 ```
 > Note: The QueryBuilder will call the Database class once obtained the final query. All the values are binded. Please refer to [PDO Bind Value](https://www.php.net/manual/en/pdostatement.bindvalue.php)
 
-> WARNING: For security reasons you must always validate data before sending it to the Builder.
+> WARNING: For security reasons you must always validate and sanitize data before sending it to the Builder.
 
 ## Requests
 The framework is [PSR-7](https://www.php-fig.org/psr/psr-7/) compliant. Please check the following examples:
