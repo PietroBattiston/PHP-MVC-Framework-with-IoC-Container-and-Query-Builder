@@ -74,7 +74,6 @@ You will find an ExampleController and a PageController as examples.
 	    public function __construct(ModelExample $model, Environment $twig)
 	    {
 	        $this->model = $model;
-	        $this->request = $request;
 	        $this->twig = $twig;
 	    }
 	    public function index()
