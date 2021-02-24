@@ -35,6 +35,7 @@ You can define your routes inside RouteList.php
 	$routeList = [
                 'GET' => [
                     '/' => 'ExampleController@index',
+		    '/show/{$id}' => 'ExampleController@show'
                 ],
                 'POST' => [
                     'create' => 'ExampleController@create',
